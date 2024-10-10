@@ -39,8 +39,6 @@ def sendReq(destIP, port):
     header = (pt.to_bytes(1, 'big'), seq.to_bytes(4, 'big'), l.to_bytes(4, 'big'))
     soc.sendto(header, (destIP, port))
 
-
-
 def main():
     print("START REQUESTER")
 
