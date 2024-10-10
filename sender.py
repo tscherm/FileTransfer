@@ -1,7 +1,7 @@
 import argparse
 import socket
 from datetime import datetime, timedelta
-
+import os
 
 # set up arg
 parser = argparse.ArgumentParser(description="Send part of a file in packets to a reciever")
@@ -19,6 +19,11 @@ mspp = timedelta(1000000 / args.rate)
 
 # variable to tell if port should be listening
 isListening = True
+
+# file to send
+toSendName = "FIND HOW TO FIND THIS NAME.txt"
+toSend = open(toSendName, "r")
+toSendSize = os.stat(toSendName).st_size
 
 # open port (to listen on only?)
 hostname = socket.gethostname()
@@ -46,22 +51,45 @@ def sendPacketTimed(packet, addr, lastTimeSent):
     # wait for time to be ready to send 
     while ((datetime.now() - lastTimeSent) < mspp):
         continue
+
+    toReturn = datetime.now()
     sendSoc.sendto(packet, addr)
+
+    return toReturn
 
 # handle request packet
 def handleReq(data, addr):
+    # check that it is a request packet
     if (data[:1][0] != 'R'):
         return -1
     
-    #int numPackets = 
+    # get the number of packets to send
+    numPackets = toSendSize // args.length if toSendSize % args.length == 0 else toSendSize // args.length + 1
 
-    #for(int )
+    # iterate over chunks of data and send it
+    lastTime = datetime.now() - timedelta(year=1)
+    seqNum = args.seqNo
+    sizeLeft = toSendSize
+    for i in range(numPackets):
+        # make header
+        pSize = args.length if sizeLeft >= args.length else sizeLeft
+        header = b'D' + seqNum.to_bytes() + pSize.to_bytes()
+
+        # get payload and add header to packet
+        payload = toSend.read(pSize).encode('utf-8')
+        packet = header + payload
+
+        lastTime = sendPacketTimed(packet, addr, lastTime)
+
+    # send END packet
+    
 
 
 # fucntion to listen for packets and send packets elsewhere
 def waitListen():
     while isListening:
         data, addr = recSoc.recvfrom(1024)
+        handleReq(data, addr)
 
 
 
