@@ -39,6 +39,44 @@ def sendReq(destIP, port):
     header = (pt.to_bytes(1, 'big'), seq.to_bytes(4, 'big'), l.to_bytes(4, 'big'))
     soc.sendto(header, (destIP, port))
 
+# function to readd the tracker
+# Assumed name is tracker.txt
+def readTracker():
+    # create dictionary with file names
+    global files
+    files = dict()
+
+    # first pass to get size for arrays of tuples of data
+    with open("tracker.txt", 'r') as tracker:
+        line = tracker.readline()
+        while line:
+            vals = line.split()
+
+            # check if the value exists in the dictionary
+            if files.get(vals[0]) is None:
+                files[vals[0]] = list()
+            # add string values to array
+            files[vals[0]].append((vals[1], vals[2], vals[3], vals[4]))
+
+            # get new line
+            line = tracker.readline()
+
+        # sort values in arrays for each file
+        for k in files.keys():
+            # array to replace old array
+            tempArr = [(0,0,0)] * len(files[k])
+
+            # iterate over each element and place it in the right spot
+            for t in files[k]:
+                spot = int(t[0])
+                # convert host name to ip, port to int, remove b from bytes to int
+                tempArr[spot] = (socket.gethostbyname(t[1]), int(t[2]), int(t[3][:-1]))
+            # replace old array with the new one
+            files[k] = tempArr
+
+
+    
+
 def main():
     print("START REQUESTER")
 

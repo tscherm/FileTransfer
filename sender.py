@@ -88,13 +88,18 @@ def handleReq(data, addr):
 # fucntion to listen for packets and send packets elsewhere
 def waitListen():
     while isListening:
-        data, addr = recSoc.recvfrom(1024)
+        data, addr = recSoc.recvfrom(2048)
+        print(data)
         handleReq(data, addr)
 
-
+def cleanup():
+    toSend.close()
 
 def main():
-    print("STARTED")
+    print("STARTED SENDER")
+    waitListen()
+    cleanup()
+
 
 if __name__ == '__main__':
     main()
