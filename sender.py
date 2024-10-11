@@ -59,6 +59,7 @@ def sendPacketTimed(packet, addr, lastTimeSent):
 
 # handle request packet
 def handleReq(data, addr):
+    print(f"REQUEST RECIEVED: {data}")
     # check that it is a request packet
     if (data[:1][0] != 'R'):
         return -1

@@ -74,11 +74,21 @@ def readTracker():
             # replace old array with the new one
             files[k] = tempArr
 
-
+def getFile(fileName):
+    #iterate over senders to get file from
+    for s in files[fileName]:
+        # send request to sender
+        sendReq(s[0], s[1])
+        print("REQ SENT")
     
 
 def main():
     print("START REQUESTER")
+    # get files to get
+    readTracker()
+    # for each file get the file
+    for fileName in files.keys():
+        getFile(fileName)
 
 if __name__ == '__main__':
     main()
