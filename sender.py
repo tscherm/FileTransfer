@@ -29,7 +29,7 @@ toSendSize = os.stat(toSendName).st_size
 hostname = socket.gethostname()
 ipAddr = socket.gethostbyname(hostname)
 
-reqAddr = (ipAddr, args.port)
+reqAddr = (ipAddr, args.sPort)
 
 recSoc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 recSoc.bind(reqAddr)
