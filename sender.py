@@ -53,7 +53,7 @@ def sendPacketTimed(packet, addr, lastTimeSent):
         continue
 
     toReturn = datetime.now()
-    sendSoc.sendto(packet, addr)
+    sendSoc.sendto(packet, (addr, args.rPort))
 
     return toReturn
 
@@ -64,6 +64,7 @@ def handleReq(data, addr):
     if (data[:1][0] != 'R'):
         return -1
     
+    print(f"PROCESSING STARTED")
     # get the number of packets to send
     numPackets = toSendSize // args.length if toSendSize % args.length == 0 else toSendSize // args.length + 1
 
@@ -74,13 +75,16 @@ def handleReq(data, addr):
     for i in range(numPackets):
         # make header
         pSize = args.length if sizeLeft >= args.length else sizeLeft
-        header = b'D' + seqNum.to_bytes() + pSize.to_bytes()
+        header = b'D' + socket.htonl(seqNum).to_bytes(4) + socket.htonl(pSize).to_bytes(4)
 
         # get payload and add header to packet
         payload = toSend.read(pSize).encode('utf-8')
         packet = header + payload
 
         lastTime = sendPacketTimed(packet, addr, lastTime)
+
+        # print packet info
+        printPacket("DATA", lastTime, addr, seqNum, pSize, payload)
 
     # send END packet
     
@@ -91,7 +95,7 @@ def waitListen():
     while isListening:
         data, addr = recSoc.recvfrom(2048)
         print(data)
-        handleReq(data, addr)
+        handleReq(data, addr[0])
 
 def cleanup():
     toSend.close()

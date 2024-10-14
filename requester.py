@@ -36,7 +36,7 @@ def sendReq(destIP, port):
     seq = 0
     l = 0
 
-    header = pt + seq.to_bytes(4, 'big') + l.to_bytes(4, 'big')
+    header = pt + socket.htonl(seq).to_bytes(4) + socket.htonl(l).to_bytes(4)
     soc.sendto(header, (destIP, port))
 
 # function to readd the tracker
