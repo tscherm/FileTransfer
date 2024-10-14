@@ -32,11 +32,11 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
 
 # function to send request to specified sender
 def sendReq(destIP, port):
-    pt = 'R'
+    pt = b'R'
     seq = 0
     l = 0
 
-    header = (pt.to_bytes(1, 'big'), seq.to_bytes(4, 'big'), l.to_bytes(4, 'big'))
+    header = pt + seq.to_bytes(4, 'big') + l.to_bytes(4, 'big')
     soc.sendto(header, (destIP, port))
 
 # function to readd the tracker
@@ -68,7 +68,7 @@ def readTracker():
 
             # iterate over each element and place it in the right spot
             for t in files[k]:
-                spot = int(t[0])
+                spot = int(t[0]) - 1
                 # convert host name to ip, port to int, remove b from bytes to int
                 tempArr[spot] = (socket.gethostbyname(t[1]), int(t[2]), int(t[3][:-1]))
             # replace old array with the new one
