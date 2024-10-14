@@ -21,7 +21,7 @@ mspp = timedelta(1000000 / args.rate)
 isListening = True
 
 # file to send
-toSendName = "FIND HOW TO FIND THIS NAME.txt"
+toSendName = "split.txt"
 toSend = open(toSendName, "r")
 toSendSize = os.stat(toSendName).st_size
 
