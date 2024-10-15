@@ -72,7 +72,7 @@ def handleReq(data, addr):
     numPackets = toSendSize // ctypes.c_uint32(args.length).value if toSendSize % ctypes.c_uint32(args.length).value == 0 else toSendSize // ctypes.c_uint32(args.length).value + 1
 
     # iterate over chunks of data and send it
-    lastTime = datetime.now() - timedelta(year=1)
+    lastTime = datetime.now() - timedelta(days=1)
     seqNum = args.seqNo
     sizeLeft = toSendSize
     for i in range(numPackets):
