@@ -17,7 +17,7 @@ parser.add_argument("-l", "--length", type=int, required=True, dest="length")
 args = parser.parse_args()
 
 # milliseconds per packet
-mspp = timedelta(1000000 / args.rate)
+mspp = timedelta(seconds = (1 / args.rate))
 
 # variable to tell if port should be listening
 isListening = True
