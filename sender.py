@@ -45,7 +45,7 @@ def printPacket(ptype, time, destAddr, seqNo, length, payload):
     print(f"send time:\t{timeStr}")
     print(f"requester addr:\t{destAddr}:{args.rPort}")
     print(f"Sequence num:\t{seqNo}")
-    print(f"length:\t{ctypes.c_uint32(length)}")
+    print(f"length:\t{ctypes.c_uint32(length).value}")
     print(f"payload:\t{payload}\n")
 
 # send packet with respect to time
@@ -69,7 +69,7 @@ def handleReq(data, addr):
     
     print(f"PROCESSING STARTED")
     # get the number of packets to send
-    numPackets = toSendSize // ctypes.c_uint32(args.length) if toSendSize % ctypes.c_uint32(args.length) == 0 else toSendSize // ctypes.c_uint32(args.length) + 1
+    numPackets = toSendSize // ctypes.c_uint32(args.length).value if toSendSize % ctypes.c_uint32(args.length).value == 0 else toSendSize // ctypes.c_uint32(args.length).value + 1
 
     # iterate over chunks of data and send it
     lastTime = datetime.now() - timedelta(year=1)
@@ -77,7 +77,7 @@ def handleReq(data, addr):
     sizeLeft = toSendSize
     for i in range(numPackets):
         # make header
-        pSize = ctypes.c_uint32(args.length) if sizeLeft >= ctypes.c_uint32(args.length) else sizeLeft
+        pSize = ctypes.c_uint32(args.length).value if sizeLeft >= ctypes.c_uint32(args.length).value else sizeLeft
         header = b'D' + socket.htonl(seqNum).to_bytes(4, 'big') + socket.htonl(pSize).to_bytes(4, 'big')
 
         # get payload and add header to packet
