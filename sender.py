@@ -99,6 +99,7 @@ def waitListen():
 
 def cleanup():
     toSend.close()
+    recSoc.close()
 
 def main():
     print("STARTED SENDER")

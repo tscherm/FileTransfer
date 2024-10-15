@@ -1,5 +1,6 @@
 import argparse
 import socket
+from datetime import datetime
 
 # set up arg
 parser = argparse.ArgumentParser(description="Request part of a file in packets to a reciever")
@@ -17,6 +18,10 @@ reqAddr = (ipAddr, args.port)
 
 soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 soc.bind(reqAddr)
+
+# open file to write to
+# this also creates a file assuming it is not there or overwrites it if it exists
+toWrite = open(args.fileName, 'w')
 
 def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
     print(f"{ptype} Packet")
@@ -74,21 +79,63 @@ def readTracker():
             # replace old array with the new one
             files[k] = tempArr
 
+
+# handles a packet from sender
+# returns false if it gets something other than data packet (End packet)
+# returns true if it gets a data packet
+def handlePacket(data, addr, time):
+    # get header values
+    pType = data[0]
+    seqNo = socket.ntohl(int.from_bytes(data[1:5]))
+    pLen = socket.ntohl(int.from_bytes(data[5:9]))
+
+    # check packet type
+    # End type
+    if (pType.to_bytes() == b'E'):
+        printPacket("End", time, addr[0], addr[1], seqNo, pLen, 0, 0)
+        return False
+    elif (pType.to_bytes() != b'D'):
+        # something went wrong
+        return False
+    # Data packet
+
+    payload = data[9:]
+    toWrite.write(payload)
+    # fix bytes written for percent
+    printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, 0, 0)
+
+# fucntion to listen for packets and send packets elsewhere
+def waitListen():
+    isListening = True
+    while isListening:
+        data, addr = soc.recvfrom(2048)
+        print(data)
+        isListening = handlePacket(data, addr, datetime.now())
+
 def getFile(fileName):
-    #iterate over senders to get file from
+    # iterate over senders to get file from
     for s in files[fileName]:
         # send request to sender
         sendReq(s[0], s[1])
-        print("REQ SENT")
-    
+        # wait for and handle to packets
+        waitListen()
+
+# function to clean and close all parts of the project
+def cleanup():
+    toWrite.close()
+    soc.close()
 
 def main():
     print("START REQUESTER")
     # get files to get
     readTracker()
-    # for each file get the file
-    for fileName in files.keys():
-        getFile(fileName)
+    # check that file name is in files/tracker
+    if args.fileName not in files.keys():
+        print("FILE NOT FOUND IN TRACKER")
+        return -1
+    # get the file
+    getFile(args.fileName)
+    cleanup()
 
 if __name__ == '__main__':
     main()
