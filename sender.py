@@ -2,6 +2,8 @@ import argparse
 import socket
 from datetime import datetime, timedelta
 import os
+import ctypes
+import sys
 
 # set up arg
 parser = argparse.ArgumentParser(description="Send part of a file in packets to a reciever")
@@ -43,7 +45,7 @@ def printPacket(ptype, time, destAddr, seqNo, length, payload):
     print(f"send time:\t{timeStr}")
     print(f"requester addr:\t{destAddr}:{args.rPort}")
     print(f"Sequence num:\t{seqNo}")
-    print(f"length:\t{length}")
+    print(f"length:\t{ctypes.c_uint32(length)}")
     print(f"payload:\t{payload}\n")
 
 # send packet with respect to time
@@ -61,12 +63,13 @@ def sendPacketTimed(packet, addr, lastTimeSent):
 def handleReq(data, addr):
     print(f"REQUEST RECIEVED: {data}")
     # check that it is a request packet
-    if (data[:1][0] != 'R'):
+    # 'R' = 82
+    if (data[0] != 82):
         return -1
     
     print(f"PROCESSING STARTED")
     # get the number of packets to send
-    numPackets = toSendSize // args.length if toSendSize % args.length == 0 else toSendSize // args.length + 1
+    numPackets = toSendSize // ctypes.c_uint32(args.length) if toSendSize % ctypes.c_uint32(args.length) == 0 else toSendSize // ctypes.c_uint32(args.length) + 1
 
     # iterate over chunks of data and send it
     lastTime = datetime.now() - timedelta(year=1)
@@ -74,7 +77,7 @@ def handleReq(data, addr):
     sizeLeft = toSendSize
     for i in range(numPackets):
         # make header
-        pSize = args.length if sizeLeft >= args.length else sizeLeft
+        pSize = ctypes.c_uint32(args.length) if sizeLeft >= ctypes.c_uint32(args.length) else sizeLeft
         header = b'D' + socket.htonl(seqNum).to_bytes(4, 'big') + socket.htonl(pSize).to_bytes(4, 'big')
 
         # get payload and add header to packet
@@ -85,8 +88,14 @@ def handleReq(data, addr):
 
         # print packet info
         printPacket("DATA", lastTime, addr, seqNum, pSize, payload)
+        seqNum += pSize
 
     # send END packet
+    pt = b'R'
+    l = 0
+
+    packet = pt + socket.htonl(seqNum).to_bytes(4, 'big') + socket.htonl(l).to_bytes(4, 'big')
+    sendPacketTimed(packet, addr, lastTime)
     
 
 
@@ -94,12 +103,12 @@ def handleReq(data, addr):
 def waitListen():
     while isListening:
         data, addr = recSoc.recvfrom(2048)
-        print(data)
         handleReq(data, addr[0])
 
 def cleanup():
     toSend.close()
     recSoc.close()
+    sys.exit()
 
 def main():
     print("STARTED SENDER")

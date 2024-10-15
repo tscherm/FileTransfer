@@ -1,6 +1,7 @@
 import argparse
 import socket
 from datetime import datetime
+import sys
 
 # set up arg
 parser = argparse.ArgumentParser(description="Request part of a file in packets to a reciever")
@@ -124,6 +125,7 @@ def getFile(fileName):
 def cleanup():
     toWrite.close()
     soc.close()
+    sys.exit()
 
 def main():
     print("START REQUESTER")
