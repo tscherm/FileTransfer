@@ -75,7 +75,7 @@ def handleReq(data, addr):
     for i in range(numPackets):
         # make header
         pSize = args.length if sizeLeft >= args.length else sizeLeft
-        header = b'D' + socket.htonl(seqNum).to_bytes(4) + socket.htonl(pSize).to_bytes(4)
+        header = b'D' + socket.htonl(seqNum).to_bytes(4, 'big') + socket.htonl(pSize).to_bytes(4, 'big')
 
         # get payload and add header to packet
         payload = toSend.read(pSize).encode('utf-8')

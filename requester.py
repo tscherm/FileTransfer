@@ -41,7 +41,7 @@ def sendReq(destIP, port):
     seq = 0
     l = 0
 
-    header = pt + socket.htonl(seq).to_bytes(4) + socket.htonl(l).to_bytes(4)
+    header = pt + socket.htonl(seq).to_bytes(4, 'big') + socket.htonl(l).to_bytes(4, 'big')
     soc.sendto(header, (destIP, port))
 
 # function to readd the tracker
@@ -86,8 +86,8 @@ def readTracker():
 def handlePacket(data, addr, time):
     # get header values
     pType = data[0]
-    seqNo = socket.ntohl(int.from_bytes(data[1:5]))
-    pLen = socket.ntohl(int.from_bytes(data[5:9]))
+    seqNo = socket.ntohl(int.from_bytes(data[1:5], 'big'))
+    pLen = socket.ntohl(int.from_bytes(data[5:9], 'big'))
 
     # check packet type
     # End type
