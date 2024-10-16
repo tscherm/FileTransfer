@@ -108,7 +108,7 @@ def handleReq(data, addr):
     sendPacketTimed(packet, addr, lastTime)
 
     # print end packet
-    printPacket("END", lastTime, addr, seqNum, pSize, 0)
+    printPacket("END", lastTime, addr, seqNum, l, 0)
     
 
 # fucntion to listen for packets and send packets elsewhere
