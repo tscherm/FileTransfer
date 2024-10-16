@@ -117,13 +117,44 @@ def handlePacket(data, addr, time):
     printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, currSizeBytes / finalSizeBytes, payload)
     return True
 
+def printSummary(addr, numP, numB, pps, ms):
+    print("Summary")
+    print(f"sender addr:\t{addr[0]}:{addr[1]}")
+    print(f"Total Data packets:\t{numP}")
+    print(f"Total Data bytes:\t{numB}")
+    print(f"Average packets/second:\t{pps:.0f}")
+    print(f"Duration of the test:\t{ms:.0f}  ms\n")
+    
+
 # fucntion to listen for packets and send packets elsewhere
-def waitListen():
+# handles packets coming from a specific host
+def waitListen(ipToListenFor, numBytes):
     isListening = True
+    currAddr = ('', 0)
+    totalDataPackets = 0
+    start = datetime.now()
+
     while isListening:
         data, addr = soc.recvfrom(2048)
-        print(data)
-        isListening = handlePacket(data, addr, datetime.now())
+        now = datetime.now()
+
+        # check if it is from the same address for summary
+        # check that it is from the right address
+        if (currAddr != addr or addr[0] != ipToListenFor):
+            continue
+        # check if it has even been set yet
+        elif (currAddr == ('', 0) and addr[0] == ipToListenFor):
+            currAddr = addr
+        
+        isListening = handlePacket(data, addr, now)
+
+        # check if data packet was recieved
+        if isListening:
+            totalDataPackets += 1
+    # calculate time and print summary
+    end = datetime.now()
+    totalTime = (end - start).total_seconds()
+    printSummary(currAddr, totalDataPackets, numBytes, totalDataPackets / totalTime, totalTime * 1000)
 
 def getFile(fileName):
     # get size of the file
@@ -134,10 +165,9 @@ def getFile(fileName):
     # iterate over senders to get file from
     for s in files[fileName]:
         # send request to sender
-        print(f"bals: {s[0]}")
         sendReq(s[0], s[1])
         # wait for and handle to packets
-        waitListen()
+        waitListen(s[0], s[2])
 
 # function to clean and close all parts of the project
 def cleanup():
