@@ -147,7 +147,6 @@ def cleanup():
     sys.exit()
 
 def main():
-    print("STARTED SENDER")
     waitListen()
     cleanup()
 

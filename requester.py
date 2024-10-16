@@ -192,13 +192,12 @@ def cleanup():
     sys.exit()
 
 def main():
-    print("START REQUESTER")
     # get files to get
     readTracker()
     # check that file name is in files/tracker
     if args.fileName not in files.keys():
         print("FILE NOT FOUND IN TRACKER")
-        return -1
+        sys.exit()
     # get the file
     getFile(args.fileName)
     cleanup()
