@@ -108,7 +108,7 @@ def handlePacket(data, addr, time):
         return False
     # Data packet
 
-    payload = data[9:pLen]
+    payload = data[9:9 + pLen]
     toWrite.write(payload.decode('utf-8'))
     # add bytes written and print packet info
     global currSizeBytes

@@ -61,7 +61,7 @@ def openFile(data):
     # get file name
     nameLen = socket.ntohl(int.from_bytes(data[5:9], 'big'))
     
-    toSendName= data[9:nameLen].decode('utf-8')
+    toSendName= data[9:9 + nameLen].decode('utf-8')
     toSend = open(toSendName, "r")
     toSendSize = os.stat(toSendName).st_size
 
