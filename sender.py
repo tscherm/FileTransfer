@@ -38,7 +38,10 @@ def printPacket(ptype, time, destAddr, seqNo, length, payload):
     print(f"requester addr:\t{destAddr}:{args.rPort}")
     print(f"Sequence num:\t{seqNo}")
     print(f"length:\t\t{ctypes.c_uint32(length).value}")
-    print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
+    if ptype == "DATA":
+        print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
+    else:
+        print(f"payload:\t\t\n")
 
 # send packet with respect to time
 def sendPacketTimed(packet, addr, lastTimeSent):
@@ -67,13 +70,10 @@ def openFile(data):
 
 # handle request packet
 def handleReq(data, addr):
-    print(f"REQUEST RECIEVED: {data}")
     # check that it is a request packet
     # 'R' = 82
     if (data[0] != 82):
         return -1
-    
-    print(f"PROCESSING STARTED")
 
     # get file info
     openFile(data)
@@ -104,11 +104,12 @@ def handleReq(data, addr):
     # send END packet
     pt = b'E'
     l = 0
-
     packet = pt + socket.htonl(seqNum).to_bytes(4, 'big') + socket.htonl(l).to_bytes(4, 'big')
     sendPacketTimed(packet, addr, lastTime)
-    
 
+    # print end packet
+    printPacket("END", lastTime, addr, seqNum, pSize, 0)
+    
 
 # fucntion to listen for packets and send packets elsewhere
 def waitListen():

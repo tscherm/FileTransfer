@@ -41,7 +41,6 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
     else:
         print(f"payload:\t\n")
 
-
 # function to send request to specified sender
 def sendReq(destIP, port):
     pt = b'R'
@@ -117,9 +116,10 @@ def handlePacket(data, addr, time):
     printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, currSizeBytes / finalSizeBytes, payload)
     return True
 
+# prints summary of what specific sender sent
 def printSummary(addr, numP, numB, pps, ms):
     print("Summary")
-    print(f"sender addr:\t{addr[0]}:{addr[1]}")
+    print(f"sender addr:\t\t{addr[0]}:{addr[1]}")
     print(f"Total Data packets:\t{numP}")
     print(f"Total Data bytes:\t{numB}")
     print(f"Average packets/second:\t{pps:.0f}")
@@ -128,6 +128,8 @@ def printSummary(addr, numP, numB, pps, ms):
 
 # fucntion to listen for packets and send packets elsewhere
 # handles packets coming from a specific host
+# takes IP that it should be coming from and gets it's port
+# also takes number of bytes it expects to recieve
 def waitListen(ipToListenFor, numBytes):
     isListening = True
     currAddr = ('', 0)
@@ -140,7 +142,7 @@ def waitListen(ipToListenFor, numBytes):
 
         # check if it is from the same address for summary
         # check that it is from the right address
-        if (currAddr != addr or addr[0] != ipToListenFor):
+        if (addr[0] != ipToListenFor):
             continue
         # check if it has even been set yet
         elif (currAddr == ('', 0) and addr[0] == ipToListenFor):
@@ -156,6 +158,7 @@ def waitListen(ipToListenFor, numBytes):
     totalTime = (end - start).total_seconds()
     printSummary(currAddr, totalDataPackets, numBytes, totalDataPackets / totalTime, totalTime * 1000)
 
+# gets file from tracker and sends requests to each host in list
 def getFile(fileName):
     # get size of the file
     for s in files[fileName]:
