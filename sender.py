@@ -18,10 +18,10 @@ parser.add_argument("-l", "--length", type=int, required=True, dest="length")
 args = parser.parse_args()
 
 # check port numbers
-if 2049 < args.sPort or args.sPort < 65536:
+if 2049 > args.sPort or args.sPort > 65536:
     print("Sender port out of range.")
     sys.exit()
-if 2049 < args.rPort or args.rPort < 65536:
+if 2049 > args.rPort or args.rPort > 65536:
     print("Requester port out of range.")
     sys.exit()
 
