@@ -75,7 +75,9 @@ def handleReq(data, addr):
     
     print(f"PROCESSING STARTED")
 
-    # get file name
+    # get file info
+    openFile(data)
+
     # get the number of packets to send
     numPackets = toSendSize // ctypes.c_uint32(args.length).value if toSendSize % ctypes.c_uint32(args.length).value == 0 else toSendSize // ctypes.c_uint32(args.length).value + 1
 
