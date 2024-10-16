@@ -34,9 +34,9 @@ sendSoc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 def printPacket(ptype, time, destAddr, seqNo, length, payload):
     print(f"{ptype} Packet")
     timeStr = (time.strftime("%y-%m-%d %H:%M:%S.%f"))[:-3]
-    print(f"send time:\t{timeStr}")
+    print(f"send time:\t20{timeStr}")
     print(f"requester addr:\t{destAddr}:{args.rPort}")
-    print(f"Sequence num:\t{seqNo}")
+    print(f"sequence:\t{seqNo}")
     print(f"length:\t\t{ctypes.c_uint32(length).value}")
     if ptype == "DATA":
         print(f"payload:\t{payload[0:4].decode('utf-8')}\n")

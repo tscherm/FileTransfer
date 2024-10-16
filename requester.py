@@ -31,7 +31,7 @@ currSizeBytes = 0
 def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
     print(f"{ptype} Packet")
     timeStr = (time.strftime("%y-%m-%d %H:%M:%S.%f"))[:-3]
-    print(f"recieve time:\t{timeStr}")
+    print(f"recv time:\t20{timeStr}")
     print(f"sender addr:\t{srcAddr}:{srcPort}")
     print(f"sequence:\t{seq}")
     print(f"length:\t\t{length}")
@@ -39,7 +39,7 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
         print(f"percentage:{percent:^12,.2%}")
         print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
     else:
-        print(f"payload:\t\n")
+        print(f"payload:\t0\n")
 
 # function to send request to specified sender
 def sendReq(destIP, port):
