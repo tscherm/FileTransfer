@@ -36,8 +36,10 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
     print(f"sequence:\t{seq}")
     print(f"length:\t{length}")
     if (ptype == "DATA"):
-        print(f"percentage:\t{percent:.1%}")
-    print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
+        print(f"percentage:\t{percent:^12,.2%}")
+        print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
+    else:
+        print(f"payload:\t0\n")
 
 
 # function to send request to specified sender
@@ -105,12 +107,12 @@ def handlePacket(data, addr, time):
     # Data packet
 
     payload = data[9:]
-    toWrite.write(payload.encode('utf-8'))
+    toWrite.write(payload.decode('utf-8'))
     # add bytes written and print packet info
     global currSizeBytes
     currSizeBytes += pLen
     global finalSizeBytes
-    printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, currSizeBytes / finalSizeBytes, 0)
+    printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, currSizeBytes / finalSizeBytes, payload)
 
 # fucntion to listen for packets and send packets elsewhere
 def waitListen():
