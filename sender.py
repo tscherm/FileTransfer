@@ -19,11 +19,6 @@ args = parser.parse_args()
 # milliseconds per packet
 mspp = timedelta(seconds = (1 / args.rate))
 
-# file to send
-toSendName = "split.txt"
-toSend = open(toSendName, "r")
-toSendSize = os.stat(toSendName).st_size
-
 # open port (to listen on only?)
 hostname = socket.gethostname()
 ipAddr = socket.gethostbyname(hostname)
@@ -56,6 +51,20 @@ def sendPacketTimed(packet, addr, lastTimeSent):
 
     return toReturn
 
+# function to get file name and read file and open file
+def openFile(data):
+    # make global variables
+    global toSendName
+    global toSend
+    global toSendSize
+
+    # get file name
+    nameLen = socket.ntohl(int.from_bytes(data[5:9], 'big'))
+    
+    toSendName= data[9:nameLen].decode('utf-8')
+    toSend = open(toSendName, "r")
+    toSendSize = os.stat(toSendName).st_size
+
 # handle request packet
 def handleReq(data, addr):
     print(f"REQUEST RECIEVED: {data}")
@@ -65,6 +74,8 @@ def handleReq(data, addr):
         return -1
     
     print(f"PROCESSING STARTED")
+
+    # get file name
     # get the number of packets to send
     numPackets = toSendSize // ctypes.c_uint32(args.length).value if toSendSize % ctypes.c_uint32(args.length).value == 0 else toSendSize // ctypes.c_uint32(args.length).value + 1
 
@@ -86,6 +97,7 @@ def handleReq(data, addr):
         # print packet info
         printPacket("DATA", lastTime, addr, seqNum, pSize, payload)
         seqNum += pSize
+        sizeLeft -= pSize
 
     # send END packet
     pt = b'E'

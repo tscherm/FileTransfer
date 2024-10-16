@@ -46,10 +46,12 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
 def sendReq(destIP, port):
     pt = b'R'
     seq = 0
-    l = 0
+    l = len(args.fileName)
 
     header = pt + socket.htonl(seq).to_bytes(4, 'big') + socket.htonl(l).to_bytes(4, 'big')
-    soc.sendto(header, (destIP, port))
+    payload = args.fileName.encode('utf-8')
+    packet = header + payload
+    soc.sendto(packet, (destIP, port))
 
 # function to readd the tracker
 # Assumed name is tracker.txt
@@ -106,7 +108,7 @@ def handlePacket(data, addr, time):
         return False
     # Data packet
 
-    payload = data[9:]
+    payload = data[9:pLen]
     toWrite.write(payload.decode('utf-8'))
     # add bytes written and print packet info
     global currSizeBytes
