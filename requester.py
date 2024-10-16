@@ -39,7 +39,7 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
         print(f"percentage:{percent:^12,.2%}")
         print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
     else:
-        print(f"payload:\t0\n")
+        print(f"payload:\t\n")
 
 
 # function to send request to specified sender
@@ -131,6 +131,7 @@ def getFile(fileName):
     # iterate over senders to get file from
     for s in files[fileName]:
         # send request to sender
+        print(f"bals: {s[0]}")
         sendReq(s[0], s[1])
         # wait for and handle to packets
         waitListen()
