@@ -34,9 +34,9 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
     print(f"recieve time:\t{timeStr}")
     print(f"sender addr:\t{srcAddr}:{srcPort}")
     print(f"sequence:\t{seq}")
-    print(f"length:\t{length}")
+    print(f"length:\t\t{length}")
     if (ptype == "DATA"):
-        print(f"percentage:\t{percent:^12,.2%}")
+        print(f"percentage:{percent:^12,.2%}")
         print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
     else:
         print(f"payload:\t0\n")

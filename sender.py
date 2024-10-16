@@ -88,7 +88,7 @@ def handleReq(data, addr):
         seqNum += pSize
 
     # send END packet
-    pt = b'R'
+    pt = b'E'
     l = 0
 
     packet = pt + socket.htonl(seqNum).to_bytes(4, 'big') + socket.htonl(l).to_bytes(4, 'big')
