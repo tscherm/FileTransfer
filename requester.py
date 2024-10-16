@@ -107,7 +107,9 @@ def handlePacket(data, addr, time):
     payload = data[9:]
     toWrite.write(payload)
     # add bytes written and print packet info
+    global currSizeBytes
     currSizeBytes += pLen
+    global finalSizeBytes
     printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, currSizeBytes / finalSizeBytes, 0)
 
 # fucntion to listen for packets and send packets elsewhere
@@ -121,6 +123,7 @@ def waitListen():
 def getFile(fileName):
     # get size of the file
     for s in files[fileName]:
+        global finalSizeBytes 
         finalSizeBytes += s[2]
 
     # iterate over senders to get file from
