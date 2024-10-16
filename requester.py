@@ -2,6 +2,7 @@ import argparse
 import socket
 from datetime import datetime
 import sys
+import traceback
 
 # set up arg
 parser = argparse.ArgumentParser(description="Request part of a file in packets to a reciever")
@@ -11,18 +12,30 @@ parser.add_argument("-o", "--file_option", type=str, required=True, dest="fileNa
 
 args = parser.parse_args()
 
+# do not need to check port range
+
 # open port (to listen on only?)
 hostname = socket.gethostname()
 ipAddr = socket.gethostbyname(hostname)
 
 reqAddr = (ipAddr, args.port)
 
-soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-soc.bind(reqAddr)
+try:
+    soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    soc.bind(reqAddr)
+except:
+    print("An error occured binding the socket")
+    print(traceback.format_exc())
+    sys.exit()
 
 # open file to write to
 # this also creates a file assuming it is not there or overwrites it if it exists
-toWrite = open(args.fileName, 'w')
+try:
+    toWrite = open(args.fileName, 'w')
+except:
+    print(f"There was an issue opening the file {args.fileName}")
+    print(traceback.format_exc())
+    sys.exit()
 
 # track size of file written and end size of file
 finalSizeBytes = 0

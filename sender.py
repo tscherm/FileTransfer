@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import os
 import ctypes
 import sys
+import traceback
 
 # set up arg
 parser = argparse.ArgumentParser(description="Send part of a file in packets to a reciever")
@@ -16,6 +17,16 @@ parser.add_argument("-l", "--length", type=int, required=True, dest="length")
 
 args = parser.parse_args()
 
+# check port numbers
+if 2049 < args.sPort or args.sPort < 65536:
+    print("Sender port out of range.")
+    sys.exit()
+if 2049 < args.rPort or args.rPort < 65536:
+    print("Requester port out of range.")
+    sys.exit()
+
+# do not need to check any other parameters
+
 # milliseconds per packet
 mspp = timedelta(seconds = (1 / args.rate))
 
@@ -25,8 +36,13 @@ ipAddr = socket.gethostbyname(hostname)
 
 reqAddr = (ipAddr, args.sPort)
 
-recSoc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-recSoc.bind(reqAddr)
+try:
+    recSoc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    recSoc.bind(reqAddr)
+except:
+    print("An error occured binding the socket")
+    print(traceback.format_exc())
+    sys.exit()
 
 # socket to send from (not the same one)
 sendSoc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -64,8 +80,15 @@ def openFile(data):
     # get file name
     nameLen = socket.ntohl(int.from_bytes(data[5:9], 'big'))
     
-    toSendName= data[9:9 + nameLen].decode('utf-8')
-    toSend = open(toSendName, "r")
+    toSendName = data[9:9 + nameLen].decode('utf-8')
+
+    try:
+        toSend = open(toSendName, "r")
+    except:
+        print(f"There was an issue opening the file {toSendName}")
+        print(traceback.format_exc())
+        sys.exit()
+    
     toSendSize = os.stat(toSendName).st_size
 
 # handle request packet
