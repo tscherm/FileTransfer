@@ -99,7 +99,7 @@ def handlePacket(data, addr, time):
     if (pType.to_bytes(1, 'big') == b'E'):
         printPacket("End", time, addr[0], addr[1], seqNo, pLen, 0, 0)
         return False
-    elif (pType.to_bytes() != b'D'):
+    elif (pType.to_bytes(1. 'big') != b'D'):
         # something went wrong
         return False
     # Data packet
