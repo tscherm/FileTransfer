@@ -19,9 +19,6 @@ args = parser.parse_args()
 # milliseconds per packet
 mspp = timedelta(seconds = (1 / args.rate))
 
-# variable to tell if port should be listening
-isListening = True
-
 # file to send
 toSendName = "split.txt"
 toSend = open(toSendName, "r")
@@ -45,8 +42,8 @@ def printPacket(ptype, time, destAddr, seqNo, length, payload):
     print(f"send time:\t{timeStr}")
     print(f"requester addr:\t{destAddr}:{args.rPort}")
     print(f"Sequence num:\t{seqNo}")
-    print(f"length:\t{ctypes.c_uint32(length).value}")
-    print(f"payload:\t{payload}\n")
+    print(f"length:\t\t{ctypes.c_uint32(length).value}")
+    print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
 
 # send packet with respect to time
 def sendPacketTimed(packet, addr, lastTimeSent):
@@ -101,9 +98,10 @@ def handleReq(data, addr):
 
 # fucntion to listen for packets and send packets elsewhere
 def waitListen():
-    while isListening:
-        data, addr = recSoc.recvfrom(2048)
-        handleReq(data, addr[0])
+    # only need to listen and get one request
+    data, addr = recSoc.recvfrom(2048)
+    handleReq(data, addr[0])
+
 
 def cleanup():
     toSend.close()

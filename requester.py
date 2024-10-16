@@ -24,6 +24,10 @@ soc.bind(reqAddr)
 # this also creates a file assuming it is not there or overwrites it if it exists
 toWrite = open(args.fileName, 'w')
 
+# track size of file written and end size of file
+finalSizeBytes = 0
+currSizeBytes = 0
+
 def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
     print(f"{ptype} Packet")
     timeStr = (time.strftime("%y-%m-%d %H:%M:%S.%f"))[:-3]
@@ -33,7 +37,7 @@ def printPacket(ptype, time, srcAddr, srcPort, seq, length, percent, payload):
     print(f"length:\t{length}")
     if (ptype == "DATA"):
         print(f"percentage:\t{percent:.1%}")
-    print(f"payload:\t{payload}\n")
+    print(f"payload:\t{payload[0:4].decode('utf-8')}\n")
 
 
 # function to send request to specified sender
@@ -92,7 +96,7 @@ def handlePacket(data, addr, time):
 
     # check packet type
     # End type
-    if (pType.to_bytes() == b'E'):
+    if (pType.to_bytes(1, 'big') == b'E'):
         printPacket("End", time, addr[0], addr[1], seqNo, pLen, 0, 0)
         return False
     elif (pType.to_bytes() != b'D'):
@@ -102,8 +106,9 @@ def handlePacket(data, addr, time):
 
     payload = data[9:]
     toWrite.write(payload)
-    # fix bytes written for percent
-    printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, 0, 0)
+    # add bytes written and print packet info
+    currSizeBytes += pLen
+    printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, currSizeBytes / finalSizeBytes, 0)
 
 # fucntion to listen for packets and send packets elsewhere
 def waitListen():
@@ -114,6 +119,10 @@ def waitListen():
         isListening = handlePacket(data, addr, datetime.now())
 
 def getFile(fileName):
+    # get size of the file
+    for s in files[fileName]:
+        finalSizeBytes += s[2]
+
     # iterate over senders to get file from
     for s in files[fileName]:
         # send request to sender
