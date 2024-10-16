@@ -113,6 +113,7 @@ def handlePacket(data, addr, time):
     currSizeBytes += pLen
     global finalSizeBytes
     printPacket("DATA", time, addr[0], addr[1], seqNo, pLen, currSizeBytes / finalSizeBytes, payload)
+    return True
 
 # fucntion to listen for packets and send packets elsewhere
 def waitListen():
